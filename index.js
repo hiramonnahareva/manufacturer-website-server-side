@@ -36,11 +36,18 @@ async function run() {
       const servicesCollection = client.db('parts_manufacturer').collection('services');
       const orderCollection = client.db('parts_manufacturer').collection('order');
       const usersCollection = client.db('parts_manufacturer').collection('users');
+      const reviewsCollection = client.db('parts_manufacturer').collection('reviews');
       app.get('/services', async(req, res)=> {
           const query = {};
           const cursor = servicesCollection.find(query)
           const services = await cursor.toArray();
           res.send(services);
+      })
+      app.get('/reviews', async(req, res)=> {
+          const query = {};
+          const cursor = reviewsCollection.find(query)
+          const reviews = await cursor.toArray();
+          res.send(reviews);
       })
       app.get('/order', async(req, res)=> {
         const query = {};
@@ -91,6 +98,11 @@ async function run() {
         // const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1h'}); 
         // res.send({result, token})
         // const result = orderCollection.insertOne(order)
+        res.send(result);
+      })
+      app.post('/review', async(req, res)=> {
+        const review = req.body;
+        const result = await reviewsCollection.insertOne(review);
         res.send(result);
       })
       app.get('/users',  async(req, res)=> {
