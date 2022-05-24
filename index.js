@@ -67,6 +67,11 @@ async function run() {
         const booking = await servicesCollection.findOne(query);
         res.send(booking);
       })
+      app.post('/product', async(req, res)=> {
+        const product = req.body;
+        const result = await servicesCollection.insertOne(product);
+        res.send(result);
+      })
       app.get('order', async(req, res) => {
         const customer = req.query.email;
         const query = {customer: customer};
@@ -88,7 +93,7 @@ async function run() {
         // const result = orderCollection.insertOne(order)
         res.send(result);
       })
-      app.get('/users', verifyJwt, async(req, res)=> {
+      app.get('/users',  async(req, res)=> {
         const users = await usersCollection.find().toArray();
         res.send(users);
       })
@@ -97,15 +102,15 @@ async function run() {
         const result = await orderCollection.deleteOne(order);
         res.send(result);
       })
-            app.put('/user/admin/:email', verifyJwt, async(req, res) => {
-        const email = req.params.email;
-        const filter = {email: email};
-        const uspdateDoc = {
-          $set: {role:'admin'},
-        };
-        const result = await usersCollection.updateOne(filter, uspdateDoc);
-        res.send(result)
-      })
+      //       app.put('/user/admin/:email', verifyJwt, async(req, res) => {
+      //   const email = req.params.email;
+      //   const filter = {email: email};
+      //   const uspdateDoc = {
+      //     $set: {role:'admin'},
+      //   };
+      //   const result = await usersCollection.updateOne(filter, uspdateDoc);
+      //   res.send(result)
+      // })
       app.put('/users/:email', async(req, res) => {
         const email = req.params.email;
         const user = req.body;
