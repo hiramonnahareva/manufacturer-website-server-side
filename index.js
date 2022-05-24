@@ -36,24 +36,75 @@ async function run() {
       const servicesCollection = client.db('parts_manufacturer').collection('services');
       const orderCollection = client.db('parts_manufacturer').collection('order');
       const usersCollection = client.db('parts_manufacturer').collection('users');
-      app.get('/services',verifyJwt, async(req, res)=> {
+      app.get('/services', async(req, res)=> {
           const query = {};
           const cursor = servicesCollection.find(query)
           const services = await cursor.toArray();
           res.send(services);
-
       })
+      app.get('/order', async(req, res)=> {
+        const query = {};
+        const cursor = orderCollection.find(query)
+        const order = await cursor.toArray();
+        res.send(order);
+    })
+      // app.get('/available/:id', async(req, res)=> {
+      //   const query = req.params.id
+      //   const services = await servicesCollection.find().toArray();
+      //   const orders = await orderCollection.find(query).toArray();
+      //   services.forEach(service => {
+      //     const orderdservice = orders.filter(order => order.name === service.name);
+      //     const orderQuentity = orderdservice.map(order => order.availableQuentity);
+      //     const available = service.availableQuentity.filter(availableQuentity => !orderQuentity.includes(availableQuentity));
+      //     services.availableQuentity = available
+
+      //   })
+      //   res.send(services);
+      // })
       app.get('/service/:id', async(req, res)=> {
         const id = req.params.id;
         const query = {_id: ObjectId(id)}
         const booking = await servicesCollection.findOne(query);
         res.send(booking);
       })
-      app.post('/order', async (req, res) => {
-        const order = req.body;
-        const result = orderCollection.insertOne(order)
+      app.get('order', async(req, res) => {
+        const customer = req.query.email;
+        const query = {customer: customer};
+        const orders = await orderCollection.find(query).toArray();
+        res.send(orders);
+
+      })
+      app.put('/order/:email', async (req, res) => {
+        const order = req.params.id;
+        const data = req.body
+        const filter = { order:  order};
+        const options = {upsert: true};
+        const uspdateDoc = {
+          $set: data,
+        };
+        const result = await orderCollection.updateOne(filter, uspdateDoc, options);
+        // const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1h'}); 
+        // res.send({result, token})
+        // const result = orderCollection.insertOne(order)
         res.send(result);
-        // const query = {service: parchase.name,}
+      })
+      app.get('/users', verifyJwt, async(req, res)=> {
+        const users = await usersCollection.find().toArray();
+        res.send(users);
+      })
+      app.delete('/order/:id', verifyJwt, async(req, res)=>{
+        const order = req.body;
+        const result = await orderCollection.deleteOne(order);
+        res.send(result);
+      })
+            app.put('/user/admin/:email', verifyJwt, async(req, res) => {
+        const email = req.params.email;
+        const filter = {email: email};
+        const uspdateDoc = {
+          $set: {role:'admin'},
+        };
+        const result = await usersCollection.updateOne(filter, uspdateDoc);
+        res.send(result)
       })
       app.put('/users/:email', async(req, res) => {
         const email = req.params.email;
@@ -67,7 +118,7 @@ async function run() {
         const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1h'}); 
         res.send({result, token})
       })
-    //   console.log('db connent');
+      
     } 
     finally {
     }
