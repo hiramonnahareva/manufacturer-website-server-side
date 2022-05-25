@@ -104,7 +104,7 @@ async function run() {
         const result = await orderCollection.updateOne(filter, uspdateDoc, options);
         res.send(result);
       })
-      app.post('/review', async(req, res)=> {
+      app.post('/review', verifyJwt, async(req, res)=> {
         const review = req.body;
         const result = await reviewsCollection.insertOne(review);
         res.send(result);
