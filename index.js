@@ -6,7 +6,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 
 const port = process.env.PROT || 5000
-const stripe = require('stripe')(`51L35QjDWL5z7UYjtbX1UG8Ubj1VNSGQ0QUWfuxhix8u8EajjRKhk0uKbg9ncbOoliUNIVbtd1ixc9jb0LhDQs3qM00cxeZ1bXI`);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 app.use(cors());
 app.use(express.json()) 
@@ -82,6 +82,13 @@ async function run() {
         const order = await orderCollection.findOne(query);
         res.send(order);
       })
+      app.get('/orders/:email', async(req, res)=> {
+        const email = req.params.email;
+        const query = {email: email}
+        const order = await orderCollection.findOne(query);
+        console.log(email, order)
+        res.send(order);
+      })
       app.get('/admin/:email', verifyJwt, async(req, res)=> {
         const email = req.params.email;
        const user = await usersCollection.findOne({email: email});
@@ -113,6 +120,11 @@ async function run() {
         const users = await usersCollection.find().toArray();
         res.send(users);
       })
+      app.get('/user/:email', async(req, res)=> {
+        const email = req.params.email;
+        const user = await usersCollection.findOne({email: email});
+        res.send(user);
+      })
       app.delete('/order/:id', async(req, res)=>{
         const order = req.body;
         const result = await orderCollection.deleteOne(order);
@@ -134,6 +146,22 @@ async function run() {
         else{
           res.status(403).send({message: 'forbidden'});
         }
+      })
+        // update user 
+        app.put('/user/:id', async(req, res)=> {
+          const id = req.params.id;
+          const updatedUser = req.body;
+          const filter = {_id : ObjectId(id)};
+          const options = { upsert: true };
+          const updateDoc = {
+              $set: {
+                  name: updatedUser.name,
+                  email: updatedUser.email
+              }
+          };
+          const result = await usersCollection.updateOne(filter, updateDoc, options);
+          res.send(result);
+
       })
       app.put('/users/:email', async(req, res) => {
         const email = req.params.email;
