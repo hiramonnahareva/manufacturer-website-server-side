@@ -82,7 +82,7 @@ async function run() {
         const order = await orderCollection.findOne(query);
         res.send(order);
       })
-      app.get('/admin/:email', async(req, res)=> {
+      app.get('/admin/:email', verifyJwt, async(req, res)=> {
         const email = req.params.email;
        const user = await usersCollection.findOne({email: email});
        const isAdmin = user.role === 'admin';
