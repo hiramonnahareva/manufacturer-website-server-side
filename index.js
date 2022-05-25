@@ -86,7 +86,7 @@ async function run() {
         const email = req.params.email;
        const user = await usersCollection.findOne({email: email});
        const isAdmin = user.role === 'admin';
-       res.send(isAdmin);
+       res.send({admin: isAdmin});
       })
       app.post('/product', verifyJwt, async(req, res)=> {
         const product = req.body;
