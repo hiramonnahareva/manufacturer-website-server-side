@@ -156,7 +156,7 @@ async function run() {
 
 
 app.get('/', (req, res) => {
-  res.send('Hello World form heroku main')
+  res.send('Hello World')
 })
 
 app.listen(port, () => {
