@@ -6,7 +6,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 
 const port = process.env.PROT || 5000
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(`51L35QjDWL5z7UYjtbX1UG8Ubj1VNSGQ0QUWfuxhix8u8EajjRKhk0uKbg9ncbOoliUNIVbtd1ixc9jb0LhDQs3qM00cxeZ1bXI`);
 
 
 app.use(cors());
