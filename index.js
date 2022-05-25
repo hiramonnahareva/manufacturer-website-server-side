@@ -125,12 +125,20 @@ async function run() {
       })
             app.put('/user/admin/:email', verifyJwt, async(req, res) => {
         const email = req.params.email;
-        const filter = {email: email};
-        const uspdateDoc = {
-          $set: {role:'admin'},
-        };
-        const result = await usersCollection.updateOne(filter, uspdateDoc);
-        res.send(result)
+        const requester = req.decoded.email;
+        const requesterAccount = await usersCollection.findOne({email: requester});
+        if(requesterAccount.role === 'admin'){
+
+          const filter = {email: email};
+          const uspdateDoc = {
+            $set: {role:'admin'},
+          };
+          const result = await usersCollection.updateOne(filter, uspdateDoc);
+          res.send(result);
+        }
+        else{
+          res.status(403).send({message: 'forbidden'});
+        }
       })
       app.put('/users/:email', async(req, res) => {
         const email = req.params.email;
