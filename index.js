@@ -8,7 +8,6 @@ const app = express();
 const port = process.env.PROT || 5000
 const stripe = require('stripe')(`51L35QjDWL5z7UYjtbX1UG8Ubj1VNSGQ0QUWfuxhix8u8EajjRKhk0uKbg9ncbOoliUNIVbtd1ixc9jb0LhDQs3qM00cxeZ1bXI`);
 
-
 app.use(cors());
 app.use(express.json()) 
 
@@ -110,7 +109,7 @@ async function run() {
         const result = await orderCollection.updateOne(filter, uspdateDoc, options);
         res.send(result);
       })
-      app.post('/review', verifyJwt, async(req, res)=> {
+      app.post('/review', async(req, res)=> {
         const review = req.body;
         const result = await reviewsCollection.insertOne(review);
         res.send(result);
