@@ -5,6 +5,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 require('dotenv').config();
 const port = process.env.PROT || 5000
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 app.use(cors());
 app.use(express.json()) 
@@ -55,39 +56,25 @@ async function run() {
         const order = await cursor.toArray();
         res.send(order);
     })
-      // app.get('/available/:id', async(req, res)=> {
-      //   const query = req.params.id
-      //   const services = await servicesCollection.find().toArray();
-      //   const orders = await orderCollection.find(query).toArray();
-      //   services.forEach(service => {
-      //     const orderdservice = orders.filter(order => order.name === service.name);
-      //     const orderQuentity = orderdservice.map(order => order.availableQuentity);
-      //     const available = service.availableQuentity.filter(availableQuentity => !orderQuentity.includes(availableQuentity));
-      //     services.availableQuentity = available
-
-      //   })
-      //   res.send(services);
-      // })
       app.get('/service/:id', async(req, res)=> {
         const id = req.params.id;
         const query = {_id: ObjectId(id)}
-        const booking = await servicesCollection.findOne(query);
-        res.send(booking);
+        const service = await servicesCollection.findOne(query);
+        res.send(service);
       })
-      app.post('/product', async(req, res)=> {
+      app.get('/order/:id', async(req, res)=> {
+        const id = req.params.id;
+        const query = {_id: ObjectId(id)}
+        const order = await orderCollection.findOne(query);
+        res.send(order);
+      })
+      app.post('/product', verifyJwt, async(req, res)=> {
         const product = req.body;
         const result = await servicesCollection.insertOne(product);
         res.send(result);
       })
-      app.get('order', async(req, res) => {
-        const customer = req.query.email;
-        const query = {customer: customer};
-        const orders = await orderCollection.find(query).toArray();
-        res.send(orders);
-
-      })
       app.put('/order/:email', async (req, res) => {
-        const order = req.params.id;
+        const order = req.params.email;
         const data = req.body
         const filter = { order:  order};
         const options = {upsert: true};
@@ -95,12 +82,9 @@ async function run() {
           $set: data,
         };
         const result = await orderCollection.updateOne(filter, uspdateDoc, options);
-        // const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1h'}); 
-        // res.send({result, token})
-        // const result = orderCollection.insertOne(order)
         res.send(result);
       })
-      app.post('/review', async(req, res)=> {
+      app.post('/review', verifyJwt, async(req, res)=> {
         const review = req.body;
         const result = await reviewsCollection.insertOne(review);
         res.send(result);
@@ -109,7 +93,7 @@ async function run() {
         const users = await usersCollection.find().toArray();
         res.send(users);
       })
-      app.delete('/order/:id', verifyJwt, async(req, res)=>{
+      app.delete('/order/:id', async(req, res)=>{
         const order = req.body;
         const result = await orderCollection.deleteOne(order);
         res.send(result);
