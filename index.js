@@ -87,19 +87,24 @@ async function run() {
         const order = await orderCollection.findOne(query);
         res.send(order);
       })
-      app.patch('/order/:id', async(req, res)=> {
+      app.patch('/order-update/:id', async(req, res)=> {
         const id = req.params.id;
         const payment = req.body;
         const filter = {_id: ObjectId(id)};
-        const updateDoc = {
-          $set: {
-            paid: true,
-            transactionId: payment.transactionId,
+        console.log(payment)
+        console.log(payment.transactionId)
+        if(payment){
+          const updateDoc = {
+            $set: {
+              paid: true,
+              transactionId: payment.transactionId,
+            }
+  
           }
+          const result = await payCollection.insertOne(payment);
+          const updateOrder = await orderCollection.updateOne(filter, updateDoc);
+          res.send(updateDoc);
         }
-        const result = await payCollection.insertOne(payment);
-        const updateOrder = await orderCollection.updateOne(filter, updateDoc);
-        res.send(updateDoc);
       })
       // // get one order by email
       // app.get('/orders/:email', async(req, res)=> {
@@ -180,8 +185,11 @@ async function run() {
           const options = { upsert: true };
           const updateDoc = {
               $set: {
-                  name: updatedUser.name,
-                  email: updatedUser.email
+                name: updatedUser.user,
+                email: updatedUser.email,
+                  address: updatedUser.address,
+                  phone: updatedUser.phone,
+                  education: updatedUser.education,
               }
           };
           const result = await usersCollection.updateOne(filter, updateDoc, options);
