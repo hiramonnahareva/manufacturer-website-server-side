@@ -73,6 +73,21 @@ async function run() {
         const order = await cursor.toArray();
         res.send(order);
     })
+    // get order by email orders
+    app.get('/order', async(req, res)=> {
+      let query ;
+      const email =  req.query.email;
+      if(email){
+        query = {email: email}
+      }
+      else{
+        query = {}
+      }
+      
+      const cursor = orderCollection.find(query)
+      const order = await cursor.toArray();
+      res.send(order);
+  })
     // get one service by id 
       app.get('/service/:id', async(req, res)=> {
         const id = req.params.id;
@@ -107,13 +122,13 @@ async function run() {
         }
       })
       // // get one order by email
-      // app.get('/orders/:email', async(req, res)=> {
-      //   const email = req.params.email;
-      //   const query = {email: email}
-      //   const order = await orderCollection.findOne(query);
-      //   console.log(email, order)
-      //   res.send(order);
-      // })
+      app.get('/order', async(req, res)=> {
+        const email = req.params.email;
+        const query = {email: email}
+        const order = await orderCollection.findOne(query);
+        console.log(email, order)
+        res.send(order);
+      })
       app.get('/admin/:email', verifyJwt, async(req, res)=> {
         const email = req.params.email;
        const user = await usersCollection.findOne({email: email});
