@@ -131,8 +131,6 @@ async function run() {
       }
     });
 
-
-
     // Purchase Coins
 
     app.post('/coin/purchase', async (req, res) => {
