@@ -23,7 +23,6 @@ function  verifyJwt (req, res, next){
     }
     req.decoded = decoded;
     next();
-	@@ -30,210 +30,185 @@ function  verifyJwt (req, res, next){
 
 
 
@@ -49,6 +48,7 @@ async function run() {
         });
         res.send({clientSecret: paymentIntent.client_secret})
       });
+	    
       // all services 
       app.get('/services', async(req, res)=> {
           const query = {};
@@ -56,6 +56,7 @@ async function run() {
           const services = await cursor.toArray();
           res.send(services);
       })
+	    
       // all reviews
       app.get('/reviews', async(req, res)=> {
           const query = {};
@@ -63,6 +64,7 @@ async function run() {
           const reviews = await cursor.toArray();
           res.send(reviews);
       })
+	    
       // all orders
       app.get('/order', async(req, res)=> {
         const query = {};
@@ -70,6 +72,7 @@ async function run() {
         const order = await cursor.toArray();
         res.send(order);
     })
+	    
     // get order by email orders
     app.get('/order', async(req, res)=> {
       let query ;
@@ -85,6 +88,7 @@ async function run() {
       const order = await cursor.toArray();
       res.send(order);
   })
+	    
     // get one service by id 
       app.get('/service/:id', async(req, res)=> {
         const id = req.params.id;
@@ -92,6 +96,7 @@ async function run() {
         const service = await servicesCollection.findOne(query);
         res.send(service);
       })
+	    
       // get one order by id 
       app.get('/order/:id', async(req, res)=> {
         const id = req.params.id;
@@ -118,6 +123,7 @@ async function run() {
           res.send(updateDoc);
         }
       })
+	    
       // // get one order by email
       app.get('/order', async(req, res)=> {
         const email = req.params.email;
@@ -137,6 +143,7 @@ async function run() {
         const result = await servicesCollection.insertOne(product);
         res.send(result);
       })
+	    
       // set order by email
       app.put('/order/:email', async (req, res) => {
         const order = req.params.email;
@@ -149,23 +156,27 @@ async function run() {
         const result = await orderCollection.updateOne(filter, uspdateDoc, options);
         res.send(result);
       })
+	    
       // set one review
       app.post('/review', verifyJwt, async(req, res)=> {
         const review = req.body;
         const result = await reviewsCollection.insertOne(review);
         res.send(result);
       })
+	    
        // set all users
       app.get('/users', verifyJwt, async(req, res)=> {
         const users = await usersCollection.find().toArray();
         res.send(users);
       })
+	    
        // get user by email
       app.get('/user/:email', async(req, res)=> {
         const email = req.params.email;
         const user = await usersCollection.findOne({email: email});
         res.send(user);
       })
+	    
       // delete order
       app.delete('/order/:id', async(req, res)=>{
         const order = req.body;
@@ -189,6 +200,7 @@ async function run() {
           res.status(403).send({message: 'forbidden'});
         }
       })
+	    
         // update user 
         app.put('/user/:id', async(req, res)=> {
           const id = req.params.id;
@@ -208,6 +220,7 @@ async function run() {
           res.send(result);
 
       })
+	    
       // set user
       app.put('/users/:email', async(req, res) => {
         const email = req.params.email;
